@@ -16,6 +16,7 @@ export default defineConfig({
   },
   test: {
     include: ["evals/**/*.eval.ts"],
+    setupFiles: ["evals/setup.ts"],
     environment: "node",
     globals: false,
     testTimeout: 120_000,

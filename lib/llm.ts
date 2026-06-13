@@ -38,6 +38,9 @@ export interface CompleteJSONArgs {
   user: string;
   temperature: number;
   maxTokens: number;
+  /** OpenAI reasoning models: lower effort = faster, cheaper, less rambling →
+   *  more reliable structured output. Ignored by non-reasoning models. */
+  reasoningEffort?: "minimal" | "low" | "medium" | "high";
 }
 
 /** Returns a raw JSON string (caller parses/validates/repairs). */
@@ -53,6 +56,7 @@ export async function completeJSONText(args: CompleteJSONArgs): Promise<string> 
     temperature: args.temperature,
     maxTokens: args.maxTokens,
     jsonMode: true,
+    reasoningEffort: args.reasoningEffort,
   });
 }
 
@@ -84,14 +88,17 @@ function toOpenAIMessages(system: string, messages: ChatMessage[]) {
   ];
 }
 
-/** Some newer OpenAI models only accept the default temperature; detect that
- *  one specific rejection and retry without the param rather than failing. */
-function isTemperatureRejection(err: unknown): boolean {
+/** Some newer OpenAI models reject a custom temperature or reasoning_effort;
+ *  detect that specific rejection so we can retry without the offending param. */
+function isUnsupportedParam(err: unknown): boolean {
   const msg =
     err && typeof err === "object" && "message" in err
       ? String((err as { message: unknown }).message)
       : String(err);
-  return /temperature/i.test(msg) && /unsupported|not support|only|default/i.test(msg);
+  return (
+    /temperature|reasoning_effort|unsupported|not support/i.test(msg) &&
+    /temperature|reasoning_effort|unsupported|not support|only|default/i.test(msg)
+  );
 }
 
 interface OpenAIChatArgs {
@@ -100,6 +107,7 @@ interface OpenAIChatArgs {
   temperature: number;
   maxTokens: number;
   jsonMode?: boolean;
+  reasoningEffort?: "minimal" | "low" | "medium" | "high";
 }
 
 async function openaiChat(args: OpenAIChatArgs): Promise<string> {
@@ -114,10 +122,12 @@ async function openaiChat(args: OpenAIChatArgs): Promise<string> {
     const res = await client.chat.completions.create({
       ...base,
       temperature: args.temperature,
+      ...(args.reasoningEffort ? { reasoning_effort: args.reasoningEffort } : {}),
     });
     return res.choices[0]?.message?.content ?? "";
   } catch (err) {
-    if (isTemperatureRejection(err)) {
+    if (isUnsupportedParam(err)) {
+      // Retry without the optional sampling/reasoning params.
       const res = await client.chat.completions.create(base);
       return res.choices[0]?.message?.content ?? "";
     }

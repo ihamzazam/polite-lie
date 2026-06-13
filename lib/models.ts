@@ -71,7 +71,7 @@ export const CAPS = {
   gateMinQuestions: intEnv("GATE_MIN_QUESTIONS", 5),
   /** Output-token caps per call. */
   personaMaxTokens: intEnv("PERSONA_MAX_TOKENS", 400),
-  classifierMaxTokens: intEnv("CLASSIFIER_MAX_TOKENS", 4000),
+  classifierMaxTokens: intEnv("CLASSIFIER_MAX_TOKENS", 16000),
   narrativeMaxTokens: intEnv("NARRATIVE_MAX_TOKENS", 2000),
   generatorMaxTokens: intEnv("GENERATOR_MAX_TOKENS", 4000),
 } as const;
