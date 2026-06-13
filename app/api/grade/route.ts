@@ -8,6 +8,12 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function POST() {
+  // TODO: after transcript normalization and technique-only scoring, fire:
+  //   trackServer("transcript_analyzed", { transcript_word_count,
+  //     speaker_count, technique_score, grade, question_count,
+  //     transcript_source_format })
+  //   Import trackServer from "@/lib/analytics".
+
   return NextResponse.json(
     { error: "grading pipeline not implemented yet (Phase 2)" },
     { status: 501 },

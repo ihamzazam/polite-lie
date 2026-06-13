@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TrackOnMount from "@/app/_components/TrackOnMount";
 
 /**
  * Static example report — the judge fast-path (BUILD_PLAN Phase 4). MUST render
@@ -8,6 +9,7 @@ import Link from "next/link";
 export default function ExampleReportPage() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col justify-center px-6 py-16 text-center">
+      <TrackOnMount event="example_report_viewed" properties={{ source: "direct" }} />
       <p className="text-sm font-medium uppercase tracking-widest text-accent">
         Example report
       </p>

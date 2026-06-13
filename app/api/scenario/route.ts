@@ -9,6 +9,11 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function POST() {
+  // TODO: after scenario generation and schema validation, fire:
+  //   trackServer("custom_scenario_generated", { generation_success,
+  //     fallback_used, fallback_preset_id, disposition, fact_count, difficulty })
+  //   Import trackServer from "@/lib/analytics".
+
   return NextResponse.json(
     { error: "custom scenario generator not implemented yet (Phase 5)" },
     { status: 501 },
