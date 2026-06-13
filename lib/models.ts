@@ -1,20 +1,50 @@
 import "server-only";
 
 /**
- * Central model + cap configuration, read from env with the defaults from
- * CLAUDE.md. Keeping this in one place means prompt/temperature/cap changes are
- * a config edit, not a code hunt. Server-only: nothing here touches the client.
+ * Central provider + model + cap configuration, read from env. Keeping this in
+ * one place means a provider/model/temperature/cap change is a config edit, not
+ * a code hunt. Server-only: nothing here touches the client.
+ *
+ * The LLM provider is configurable (CLAUDE.md): OpenAI by default during
+ * development, switchable to Anthropic with LLM_PROVIDER=anthropic. Each
+ * provider has its own sensible model defaults; any model can be overridden
+ * with the matching *_MODEL env var.
  */
 
+export type LlmProvider = "openai" | "anthropic";
+
+export const PROVIDER: LlmProvider =
+  process.env.LLM_PROVIDER === "anthropic" ? "anthropic" : "openai";
+
+interface ModelSet {
+  persona: string;
+  classifier: string;
+  narrative: string;
+  generator: string;
+}
+
+const DEFAULTS: Record<LlmProvider, ModelSet> = {
+  // Persona is a fast chat model (low latency, supports temperature); grading
+  // uses the flagship for accuracy and report quality.
+  openai: {
+    persona: "gpt-5.5-instant",
+    classifier: "gpt-5.5",
+    narrative: "gpt-5.5",
+    generator: "gpt-5.5",
+  },
+  anthropic: {
+    persona: "claude-haiku-4-5-20251001",
+    classifier: "claude-sonnet-4-6",
+    narrative: "claude-sonnet-4-6",
+    generator: "claude-sonnet-4-6",
+  },
+};
+
 export const MODELS = {
-  /** Cheap, fast, temperature 0.9 — the in-character interviewee. */
-  persona: process.env.PERSONA_MODEL ?? "claude-haiku-4-5-20251001",
-  /** Temperature 0, strict JSON — Pass 1 classification. */
-  classifier: process.env.CLASSIFIER_MODEL ?? "claude-sonnet-4-6",
-  /** Writes the report prose — Pass 3. */
-  narrative: process.env.NARRATIVE_MODEL ?? "claude-sonnet-4-6",
-  /** Custom-scenario fact-sheet generation only. */
-  generator: process.env.GENERATOR_MODEL ?? "claude-sonnet-4-6",
+  persona: process.env.PERSONA_MODEL ?? DEFAULTS[PROVIDER].persona,
+  classifier: process.env.CLASSIFIER_MODEL ?? DEFAULTS[PROVIDER].classifier,
+  narrative: process.env.NARRATIVE_MODEL ?? DEFAULTS[PROVIDER].narrative,
+  generator: process.env.GENERATOR_MODEL ?? DEFAULTS[PROVIDER].generator,
 } as const;
 
 /** Hard caps (CLAUDE.md rule 6). Numeric envs override the defaults. */

@@ -1,5 +1,5 @@
 import "server-only";
-import { getAnthropic } from "@/lib/anthropic";
+import { completeText } from "@/lib/llm";
 import { MODELS, CAPS, TEMPERATURES } from "@/lib/models";
 import {
   EMPTY_META,
@@ -169,16 +169,13 @@ async function callPersona(
   systemPrompt: string,
   messages: ChatMessage[],
 ): Promise<string> {
-  const res = await getAnthropic().messages.create({
+  return completeText({
     model: MODELS.persona,
-    max_tokens: CAPS.personaMaxTokens,
-    temperature: TEMPERATURES.persona,
     system: systemPrompt,
-    messages: messages.map((m) => ({ role: m.role, content: m.content })),
+    messages,
+    temperature: TEMPERATURES.persona,
+    maxTokens: CAPS.personaMaxTokens,
   });
-  return res.content
-    .map((b) => (b.type === "text" ? b.text : ""))
-    .join("");
 }
 
 export interface PersonaTurnResult {

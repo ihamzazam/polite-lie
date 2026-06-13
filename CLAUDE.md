@@ -9,19 +9,28 @@ Full product spec: `docs/SPEC.md`. Phase plan and acceptance criteria: `docs/BUI
 ## Stack (decided, do not relitigate)
 
 - Next.js (App Router) + TypeScript + Tailwind, deployed on Vercel
-- Anthropic API for all LLM calls, server-side only
+- LLM provider is configurable via `LLM_PROVIDER` (OpenAI by default during development; Anthropic supported by flipping one env var). All LLM calls are server-side only and routed through `lib/llm.ts` so the provider is swappable without touching feature code
 - No database. Server is stateless. Custom scenarios use the sealed-token pattern (below)
 - No auth, no signup
 - Rate limiting: Upstash Redis ratelimit if `UPSTASH_REDIS_REST_URL` is set, otherwise in-memory best-effort fallback
 - Non-streaming persona replies in MVP (replies are 1-3 sentences; latency is fine)
 
-## Models (env-configured, defaults below)
+## Models (env-configured, provider-aware defaults)
+
+Persona is a fast chat model (low latency, temperature ~0.9, ~12 calls/session); grading uses the flagship for accuracy and report quality. Defaults are chosen by `LLM_PROVIDER`; override any with the matching `*_MODEL` env var.
 
 ```
-PERSONA_MODEL=claude-haiku-4-5-20251001     # cheap, fast, temperature 0.9
-CLASSIFIER_MODEL=claude-sonnet-4-6          # temperature 0, strict JSON
+# OpenAI (default)
+PERSONA_MODEL=gpt-5.5-instant   # fast, natural, supports temperature
+CLASSIFIER_MODEL=gpt-5.5        # flagship: strict JSON, temperature 0
+NARRATIVE_MODEL=gpt-5.5
+GENERATOR_MODEL=gpt-5.5         # custom scenarios only
+
+# Anthropic (LLM_PROVIDER=anthropic)
+PERSONA_MODEL=claude-haiku-4-5-20251001
+CLASSIFIER_MODEL=claude-sonnet-4-6
 NARRATIVE_MODEL=claude-sonnet-4-6
-GENERATOR_MODEL=claude-sonnet-4-6           # custom scenarios only
+GENERATOR_MODEL=claude-sonnet-4-6
 ```
 
 ## Architecture map
