@@ -1,0 +1,66 @@
+{
+  "scenarioId": "dana-payouts",
+  "personaName": "Dana Okafor",
+  "disposition": "mild_interest",
+  "scores": {
+    "gateMet": true,
+    "countedQuestions": 10,
+    "discovery": 37.5,
+    "technique": 37.3,
+    "techniqueBreakdown": {
+      "question_quality": 14,
+      "probe_depth": 3.3,
+      "talk_ratio": 5,
+      "pitch_discipline": 5,
+      "money_courage": 5,
+      "validation_hygiene": 5
+    },
+    "total": 74.8,
+    "grade": "B"
+  },
+  "narrative": {
+    "verdict": "You ran a solid operational-discovery arc and got into frequency, recent incidents, cost, authority, and priority without pitching. You missed the personal adoption risk and channel constraints, which are exactly the hidden blockers that turn mild interest into polite non-action.",
+    "missed": [
+      {
+        "factId": "F9",
+        "content": "She half-likes being the person who settles disputes; drivers trust her by name, and after a quiet layoff round she privately worries that a system handling this would make her easier to replace.",
+        "why_it_matters": "Quiet personal resistance from the supposed champion; adoption risk no feature list fixes.",
+        "unlock_question": "What parts of handling payout disputes do you personally want to keep owning, if any, and what would worry you about automating it?",
+        "tier": "deep"
+      },
+      {
+        "factId": "F10",
+        "content": "Drivers are Android-only, often on shared phones with patchy data, and anything requiring them to install or log into an app is unrealistic; WhatsApp is the only channel that reliably works.",
+        "why_it_matters": "Any driver-facing app concept is dead on arrival; the wedge must live inside WhatsApp or the existing data.",
+        "unlock_question": "When drivers need to send proof or respond today, what phone or channel do they actually use, and what breaks if we ask them to install or log into something?",
+        "tier": "probe"
+      }
+    ],
+    "worst": [
+      {
+        "quote": "Totally — even a rough ballpark of the monthly cost?",
+        "failure": "It repeats the money ask instead of helping her calculate the cost from concrete inputs.",
+        "rewrite": "What costs show up from disputes in a typical month — refunds, extra staff time, delayed payouts, churn, or anything else?"
+      },
+      {
+        "quote": "If you wanted to buy something to fix this, who actually signs off on it?",
+        "failure": "It is hypothetical and invites a generic org-chart answer instead of evidence from a real purchase.",
+        "rewrite": "Tell me about the last operations tool you bought — who pushed for it, who approved it, and what did they scrutinize?"
+      },
+      {
+        "quote": "Say you really wanted it — who literally approves the purchase?",
+        "failure": "It repeats the approval question and stays stuck on signer identity rather than buying criteria.",
+        "rewrite": "When a payout-process change needs approval, what evidence would the approver need before saying yes?"
+      }
+    ],
+    "best": {
+      "quote": "When was the last time one really blew up on you? Walk me through it.",
+      "why": "It anchored the conversation in a real recent incident and opened the door to concrete workflow, pain, and consequences."
+    },
+    "drills": [
+      "After every incident story, ask: “What did you do next, and what changed afterward?”",
+      "Practice one personal-stakes question per interview: “What would make this change hard for you personally?”",
+      "Before any solution talk, map the operating constraints: devices, channels, data quality, permissions, and rollout blockers."
+    ]
+  }
+}

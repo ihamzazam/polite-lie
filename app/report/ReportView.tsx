@@ -40,7 +40,10 @@ export default function ReportView({ report }: { report: Report }) {
   return (
     <article className="mx-auto w-full max-w-2xl px-6 py-12">
       {/* Score header */}
-      <header className="flex items-end justify-between gap-6 border-b border-ink-800 pb-8">
+      <header
+        className="animate-reveal flex items-end justify-between gap-6 border-b border-ink-800 pb-8"
+        style={{ animationDelay: "0ms" }}
+      >
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-ink-500">
             Your interview with {report.personaName}
@@ -62,13 +65,16 @@ export default function ReportView({ report }: { report: Report }) {
       </header>
 
       {/* Verdict */}
-      <p className="mt-8 font-serif text-2xl leading-snug text-ink-50">
+      <p
+        className="animate-reveal mt-8 font-serif text-2xl leading-snug text-ink-50"
+        style={{ animationDelay: "90ms" }}
+      >
         {narrative.verdict}
       </p>
 
       {/* What you never found out */}
       {narrative.missed.length > 0 && (
-        <section className="mt-12">
+        <section className="animate-reveal mt-12" style={{ animationDelay: "180ms" }}>
           <h2 className="font-serif text-xl text-ink-50">What you never found out</h2>
           <ul className="mt-5 space-y-5">
             {narrative.missed.map((m) => (
@@ -93,7 +99,7 @@ export default function ReportView({ report }: { report: Report }) {
 
       {/* Best question */}
       {narrative.best && (
-        <section className="mt-12">
+        <section className="animate-reveal mt-12" style={{ animationDelay: "270ms" }}>
           <h2 className="font-serif text-xl text-ink-50">Your best question</h2>
           <blockquote className="mt-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-5">
             <p className="text-ink-100">“{narrative.best.quote}”</p>
@@ -104,7 +110,7 @@ export default function ReportView({ report }: { report: Report }) {
 
       {/* Worst questions */}
       {narrative.worst.length > 0 && (
-        <section className="mt-12">
+        <section className="animate-reveal mt-12" style={{ animationDelay: "360ms" }}>
           <h2 className="font-serif text-xl text-ink-50">
             Where you lost the thread
           </h2>
@@ -124,7 +130,7 @@ export default function ReportView({ report }: { report: Report }) {
       )}
 
       {/* Technique breakdown (mobile-visible detail) */}
-      <section className="mt-12">
+      <section className="animate-reveal mt-12" style={{ animationDelay: "450ms" }}>
         <h2 className="font-serif text-xl text-ink-50">The breakdown</h2>
         <div className="mt-4 grid gap-x-8 sm:grid-cols-2">
           <Stat label="Discovery" value={scores.discovery} max={50} />
@@ -140,7 +146,7 @@ export default function ReportView({ report }: { report: Report }) {
 
       {/* Drills */}
       {narrative.drills.length > 0 && (
-        <section className="mt-12">
+        <section className="animate-reveal mt-12" style={{ animationDelay: "540ms" }}>
           <h2 className="font-serif text-xl text-ink-50">Three drills for next time</h2>
           <ol className="mt-4 space-y-3">
             {narrative.drills.map((d, i) => (

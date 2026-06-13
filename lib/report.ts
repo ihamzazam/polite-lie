@@ -75,3 +75,48 @@ export function toShareableReport(report: Report): ShareableReport {
   const { missed: _missed, ...rest } = report.narrative;
   return { ...report, narrative: rest };
 }
+
+// ── Share encoding (UTF-8-safe base64url) ───────────────────────────────────
+// The finished report is encoded into a URL fragment so /report#<data> renders
+// the exact scorecard with zero API calls (CLAUDE.md rule 11). The payload is
+// the REDACTED report (no missed facts) so a shared link can't spoil a preset.
+
+function b64urlEncode(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlDecode(s: string): string {
+  const padded = s.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(padded);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+export function encodeReportToHash(report: Report): string {
+  return b64urlEncode(JSON.stringify(toShareableReport(report)));
+}
+
+/** Decode a shared report. Missed facts are re-added as empty (they're never
+ *  encoded), so the result is a valid Report the ReportView can render. */
+export function decodeReportFromHash(hash: string): Report | null {
+  try {
+    const obj = JSON.parse(b64urlDecode(hash)) as ShareableReport;
+    if (!obj?.scores || !obj?.narrative) return null;
+    return { ...obj, narrative: { ...obj.narrative, missed: [] } };
+  } catch {
+    return null;
+  }
+}
+
+/** One short, savage highlight line for the share card. */
+export function shareHighlight(report: Report): string {
+  const best = report.narrative.best?.quote;
+  if (report.narrative.missed.length > 0) {
+    return `Scored ${report.scores.total}/100 but missed ${report.narrative.missed.length} fact${report.narrative.missed.length === 1 ? "" : "s"} that decide the deal.`;
+  }
+  if (best) return `Best question: “${best}”`;
+  return `Scored ${report.scores.total}/100 on interview technique.`;
+}

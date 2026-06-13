@@ -30,8 +30,9 @@ export const metadata: Metadata = {
     description:
       "Practice customer interviews against a synthetic user who lies politely. Get graded on your technique.",
     type: "website",
+    images: ["/api/og"],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/api/og"] },
 };
 
 export default function RootLayout({
