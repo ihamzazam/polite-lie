@@ -31,7 +31,7 @@ const DEFAULTS: Record<LlmProvider, ModelSet> = {
   // sampling control so it runs on the mini.
   openai: {
     persona: "gpt-5.4-mini",
-    classifier: "gpt-5.5",
+    classifier: "gpt-5.4-mini",
     narrative: "gpt-5.5",
     generator: "gpt-5.5",
   },

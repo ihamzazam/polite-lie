@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * Question taxonomy, precedence, and attribute flags. Mirrors docs/SPEC.md
  * section 3 Pass 1. This is the contract the classifier LLM must emit and the
@@ -53,35 +55,42 @@ export const BAD_TYPES: ReadonlySet<QuestionType> = new Set([
 ]);
 
 /** Whether a money ask targets spend vs. authority (money_courage scoring). */
-export type MoneyTarget = "spend" | "authority";
+export const MONEY_TARGETS = ["spend", "authority"] as const;
+export type MoneyTarget = (typeof MONEY_TARGETS)[number];
 
-export type FactVerificationStatus = "revealed" | "partial" | "unrevealed";
+export const FACT_STATUSES = ["revealed", "partial", "unrevealed"] as const;
+export type FactVerificationStatus = (typeof FACT_STATUSES)[number];
 
-/** One classified trainee turn (Pass 1 output, per turn). */
-export interface ClassifiedTurn {
-  /** Index of the user turn in the transcript (RAPPORT included, 0-based). */
-  turnIndex: number;
-  type: QuestionType;
+/** One classified trainee turn (Pass 1 output, per turn). Zod-validated since
+ *  it comes from the LLM. Callers strip nulls before validating (LLMs emit
+ *  `null` for absent optionals); see stripNulls in lib/grading.ts. */
+export const ClassifiedTurnSchema = z.object({
+  /** 1-based index of the trainee question in the numbered transcript. */
+  turnIndex: z.number().int(),
+  type: z.enum(QUESTION_TYPES),
   /** For COMPOUND turns, the type of the first sub-question. */
-  secondaryType?: QuestionType;
-  flags: AttributeFlag[];
+  secondaryType: z.enum(QUESTION_TYPES).optional(),
+  flags: z.array(z.enum(ATTRIBUTE_FLAGS)).default([]),
   /** Present when MONEY_ASK is set. */
-  moneyTarget?: MoneyTarget;
+  moneyTarget: z.enum(MONEY_TARGETS).optional(),
   /** The thread id this turn probes/continues, for probe-chain detection. */
-  threadId?: string;
+  threadId: z.string().optional(),
   /** Verbatim trainee quote backing the classification. */
-  quote: string;
-}
+  quote: z.string(),
+});
+export type ClassifiedTurn = z.infer<typeof ClassifiedTurnSchema>;
 
 /** Per-fact verification row (Pass 1 output). */
-export interface FactVerification {
-  factId: string;
-  status: FactVerificationStatus;
+export const FactVerificationSchema = z.object({
+  factId: z.string(),
+  status: z.enum(FACT_STATUSES),
   /** Verbatim persona quote that discloses the fact, when revealed/partial. */
-  quote?: string;
-}
+  quote: z.string().optional(),
+});
+export type FactVerification = z.infer<typeof FactVerificationSchema>;
 
-export interface ClassificationResult {
-  turns: ClassifiedTurn[];
-  facts: FactVerification[];
-}
+export const ClassificationSchema = z.object({
+  turns: z.array(ClassifiedTurnSchema),
+  facts: z.array(FactVerificationSchema),
+});
+export type ClassificationResult = z.infer<typeof ClassificationSchema>;

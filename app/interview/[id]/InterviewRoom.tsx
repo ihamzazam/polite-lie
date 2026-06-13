@@ -25,6 +25,7 @@ export default function InterviewRoom({ brief }: Props) {
   const [canEnd, setCanEnd] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [grading, setGrading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -92,15 +93,7 @@ export default function InterviewRoom({ brief }: Props) {
       setSignals(data.signalsCaptured);
       setQuestionsUsed(data.questionsUsed);
       setCanEnd(data.canEnd);
-      if (data.ended) {
-        setEnded(true);
-        track("interview_completed", {
-          scenario: brief.id,
-          reason: "budget",
-          signals: data.signalsCaptured,
-          questions: data.questionsUsed,
-        });
-      }
+      if (data.ended) setEnded(true);
     } catch {
       setMessages(messages);
       setInput(question);
@@ -110,24 +103,62 @@ export default function InterviewRoom({ brief }: Props) {
     }
   }
 
-  function endInterview() {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(
-        "polite-lie:lastSession",
-        JSON.stringify({ scenario: brief.id, messages, revealedIds, canon }),
-      );
-    }
+  async function endInterview(reason: "user_ended" | "budget") {
+    if (grading) return;
+    setGrading(true);
+    setError(null);
     track("interview_completed", {
       scenario: brief.id,
-      reason: "user_ended",
+      reason,
       signals,
       questions: questionsUsed,
     });
-    router.push("/report");
+    try {
+      const res = await fetch("/api/grade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario: brief.id, messages }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(data?.error ?? "We couldn't grade that session. Try again.");
+        setGrading(false);
+        return;
+      }
+      const result = await res.json();
+      sessionStorage.setItem("polite-lie:lastReport", JSON.stringify(result));
+      router.push("/report");
+    } catch {
+      setError("Network hiccup while grading — try again.");
+      setGrading(false);
+    }
   }
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-2xl flex-col px-4 sm:px-6">
+      {grading && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink-950/90 px-6 text-center backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex gap-1.5">
+            <span className="size-2 animate-bounce rounded-full bg-accent [animation-delay:-0.3s]" />
+            <span className="size-2 animate-bounce rounded-full bg-accent [animation-delay:-0.15s]" />
+            <span className="size-2 animate-bounce rounded-full bg-accent" />
+          </div>
+          <p className="mt-5 font-serif text-xl text-ink-100">
+            Grading your interview…
+          </p>
+          <p className="mt-2 max-w-sm text-sm text-ink-400">
+            Re-reading every question and checking what {firstName} quietly let
+            slip.
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <header className="flex items-center justify-between gap-4 border-b border-ink-800 py-4">
         <div className="min-w-0">
@@ -226,10 +257,11 @@ export default function InterviewRoom({ brief }: Props) {
               {firstName} had to run. That&apos;s the interview.
             </p>
             <button
-              onClick={endInterview}
-              className="mt-3 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-ink-950 transition hover:bg-accent-bright"
+              onClick={() => endInterview("budget")}
+              disabled={grading}
+              className="mt-3 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-ink-950 transition hover:bg-accent-bright disabled:opacity-60"
             >
-              See how you did
+              {grading ? "Grading…" : "See how you did"}
             </button>
           </div>
         ) : (
@@ -274,8 +306,8 @@ export default function InterviewRoom({ brief }: Props) {
                   : "Shift+Enter for a new line"}
               </span>
               <button
-                onClick={endInterview}
-                disabled={!canEnd}
+                onClick={() => endInterview("user_ended")}
+                disabled={!canEnd || grading}
                 className="font-medium text-ink-400 underline-offset-4 hover:text-accent hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                 title={
                   canEnd
@@ -283,7 +315,7 @@ export default function InterviewRoom({ brief }: Props) {
                     : "Ask a few real questions first"
                 }
               >
-                End interview
+                {grading ? "Grading…" : "End interview"}
               </button>
             </div>
           </>
