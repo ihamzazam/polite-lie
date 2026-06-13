@@ -136,4 +136,6 @@ export interface InterviewResponse {
   turnBudget: number;
   /** True once the persona has wrapped up or the turn budget is exhausted. */
   ended: boolean;
+  /** True once enough substantive questions exist to allow ending + grading. */
+  canEnd: boolean;
 }
