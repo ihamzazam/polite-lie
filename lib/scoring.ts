@@ -39,5 +39,10 @@ export interface ScoreResult {
 }
 
 export function computeScores(_input: ScoringInput): ScoreResult {
+  // TODO: when gateMet is false, fire:
+  //   trackServer("gate_triggered", { scenario_id, questions_asked,
+  //     rapport_questions, gate_min_questions: 5, turns_used })
+  //   Import trackServer from "@/lib/analytics".
+
   throw new Error("Not implemented (Phase 2)");
 }

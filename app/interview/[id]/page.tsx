@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listScenarioBriefs } from "@/lib/presets";
+import TrackOnMount from "@/app/_components/TrackOnMount";
 
 /**
  * Interview chat UI. Phase 0: a server-rendered placeholder that proves the
@@ -15,8 +16,24 @@ export default async function InterviewPage({
   const brief = listScenarioBriefs().find((b) => b.id === id);
   if (!brief) notFound();
 
+  // TODO: track("interview_completed", { scenario_id, questions_used, turn_budget,
+  //   signals_captured, total_facts, ended_by, persona_name, difficulty })
+  //   — fire when the chat loop ends (turn budget exhausted, persona wraps up,
+  //   or user clicks "end interview"). Requires the Phase 1 chat UI.
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col justify-center px-6 py-16">
+      <TrackOnMount
+        event="interview_started"
+        properties={{
+          scenario_id: brief.id,
+          persona_name: brief.persona.name,
+          difficulty: brief.difficulty,
+          turn_budget: brief.turn_budget,
+          total_facts: brief.total_facts,
+          scenario_type: "preset",
+        }}
+      />
       <p className="text-sm font-medium uppercase tracking-widest text-accent">
         Briefing
       </p>

@@ -10,6 +10,11 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function POST() {
+  // TODO: after persona reply is generated and ###META is parsed, fire:
+  //   trackServer("question_sent", { scenario_id, question_type, turn_number,
+  //     turns_remaining, signals_captured, polite_lie_triggered, message_length })
+  //   Import trackServer from "@/lib/analytics".
+
   return NextResponse.json(
     { error: "interview engine not implemented yet (Phase 1)" },
     { status: 501 },

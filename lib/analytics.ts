@@ -19,7 +19,9 @@ export type AnalyticsEvent =
   | "gate_triggered"
   | "interview_completed"
   | "report_viewed"
-  | "share_clicked";
+  | "share_clicked"
+  | "custom_scenario_generated"
+  | "transcript_analyzed";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 
@@ -44,6 +46,39 @@ export function track(event: AnalyticsEvent, props?: AnalyticsProps): void {
     } else if (process.env.NODE_ENV !== "production") {
       console.debug("[analytics]", event, props ?? {});
     }
+  } catch {
+    // Analytics must never break a user flow.
+  }
+}
+
+/**
+ * Server-side track event via Pendo Track API (HTTP POST).
+ * Requires PENDO_INTEGRATION_KEY env var. No-ops silently when absent.
+ */
+export async function trackServer(
+  event: AnalyticsEvent,
+  props?: AnalyticsProps,
+  ids?: { visitorId?: string; accountId?: string },
+): Promise<void> {
+  try {
+    const key = process.env.PENDO_INTEGRATION_KEY;
+    if (!key) return;
+
+    await fetch("https://data.pendo.io/data/track", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-pendo-integration-key": key,
+      },
+      body: JSON.stringify({
+        type: "track",
+        event,
+        visitorId: ids?.visitorId ?? "anonymous",
+        accountId: ids?.accountId ?? "system",
+        timestamp: Date.now(),
+        properties: props ?? {},
+      }),
+    });
   } catch {
     // Analytics must never break a user flow.
   }

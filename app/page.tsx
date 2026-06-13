@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listScenarioBriefs } from "@/lib/presets";
+import ScenarioCard from "@/app/_components/ScenarioCard";
 
 /** One-line hooks per scenario. Derived only from public visible profiles —
  *  never hints at disposition or hidden facts. */
@@ -94,35 +95,11 @@ export default function Home() {
         </p>
 
         <ul className="mt-10 grid gap-5 md:grid-cols-3">
-          {scenarios.map((s) => {
-            const first = s.persona.name.split(" ")[0];
-            return (
-              <li key={s.id}>
-                <Link
-                  href={`/interview/${s.id}`}
-                  className="group flex h-full flex-col rounded-2xl border border-ink-800 bg-ink-900/50 p-6 transition hover:border-accent-dim hover:bg-ink-900"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-xl text-ink-50">
-                      {s.persona.name}
-                    </h3>
-                    <span className="rounded-full border border-ink-700 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-ink-400">
-                      {s.difficulty}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-ink-400">
-                    {s.persona.role} · {s.persona.company_context}
-                  </p>
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-300">
-                    {TEASERS[s.id] ?? s.persona.visible_profile}
-                  </p>
-                  <span className="mt-6 text-sm font-medium text-accent">
-                    Interview {first} →
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+          {scenarios.map((s) => (
+            <li key={s.id}>
+              <ScenarioCard scenario={s} teaser={TEASERS[s.id]} />
+            </li>
+          ))}
         </ul>
       </section>
 
