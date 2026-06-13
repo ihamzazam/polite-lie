@@ -14,7 +14,8 @@ export const ChatMessageSchema = z.object({
 });
 
 export const InterviewRequestSchema = z.object({
-  scenario: z.string().min(1).max(4096),
+  // A preset id is short; a sealed custom-scenario token is several KB.
+  scenario: z.string().min(1).max(20000),
   messages: z.array(ChatMessageSchema).min(1).max(80),
   revealedIds: z.array(z.string().max(8)).max(40).default([]),
   canon: z.array(z.string().max(400)).max(60).default([]),

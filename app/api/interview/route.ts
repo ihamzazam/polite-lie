@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPreset, isPresetId } from "@/lib/presets";
+import { resolveScenario } from "@/lib/scenario";
 import { effectiveTurnBudget, runPersonaTurn } from "@/lib/persona";
 import { CAPS } from "@/lib/models";
 import {
@@ -38,11 +38,10 @@ export async function POST(req: Request) {
   }
   const { scenario, messages, revealedIds, canon } = parsed.data;
 
-  // Phase 1 serves presets only; sealed custom tokens arrive in Phase 5.
-  if (!isPresetId(scenario)) {
+  const sheet = resolveScenario(scenario);
+  if (!sheet) {
     return bad("Unknown or unsupported scenario.", 404);
   }
-  const sheet = getPreset(scenario)!;
 
   // The last message must be the new user question.
   const last = messages[messages.length - 1];

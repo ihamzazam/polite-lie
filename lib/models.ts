@@ -33,7 +33,7 @@ const DEFAULTS: Record<LlmProvider, ModelSet> = {
     persona: "gpt-5.4-mini",
     classifier: "gpt-5.4-mini",
     narrative: "gpt-5.5",
-    generator: "gpt-5.5",
+    generator: "gpt-5.4-mini",
   },
   anthropic: {
     persona: "claude-haiku-4-5-20251001",
@@ -73,7 +73,7 @@ export const CAPS = {
   personaMaxTokens: intEnv("PERSONA_MAX_TOKENS", 400),
   classifierMaxTokens: intEnv("CLASSIFIER_MAX_TOKENS", 16000),
   narrativeMaxTokens: intEnv("NARRATIVE_MAX_TOKENS", 2000),
-  generatorMaxTokens: intEnv("GENERATOR_MAX_TOKENS", 4000),
+  generatorMaxTokens: intEnv("GENERATOR_MAX_TOKENS", 16000),
 } as const;
 
 export const TEMPERATURES = {

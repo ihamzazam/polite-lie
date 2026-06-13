@@ -124,6 +124,19 @@ export default function Home() {
             );
           })}
         </ul>
+
+        <Link
+          href="/custom"
+          className="group mt-5 flex items-center justify-between gap-4 rounded-2xl border border-dashed border-ink-700 px-6 py-5 transition hover:border-accent-dim hover:bg-ink-900/40"
+        >
+          <span className="text-ink-200">
+            <span className="font-medium text-ink-50">Or bring your own idea.</span>{" "}
+            We&apos;ll build a customer from scratch — one who has never heard of it.
+          </span>
+          <span className="shrink-0 text-sm font-medium text-accent">
+            Build one →
+          </span>
+        </Link>
       </section>
 
       {/* Scoring one-liner */}

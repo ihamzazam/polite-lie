@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getPreset, isPresetId } from "@/lib/presets";
+import { resolveScenario } from "@/lib/scenario";
 import { gradeSession } from "@/lib/grading";
 import { ChatMessageSchema } from "@/lib/interview";
 
@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const GradeRequestSchema = z.object({
-  scenario: z.string().min(1).max(4096),
+  scenario: z.string().min(1).max(20000),
   messages: z.array(ChatMessageSchema).min(1).max(80),
 });
 
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
   if (!parsed.success) return bad("Invalid request shape.");
   const { scenario, messages } = parsed.data;
 
-  if (!isPresetId(scenario)) return bad("Unknown or unsupported scenario.", 404);
-  const sheet = getPreset(scenario)!;
+  const sheet = resolveScenario(scenario);
+  if (!sheet) return bad("Unknown or unsupported scenario.", 404);
 
   try {
     const result = await gradeSession(sheet, messages);

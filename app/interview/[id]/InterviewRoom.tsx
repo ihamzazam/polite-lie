@@ -10,9 +10,12 @@ const MAX_CHARS = 600;
 
 interface Props {
   brief: ScenarioBrief;
+  /** What to send to the API as the scenario: a preset id or a sealed token.
+   *  Defaults to the brief id (presets). */
+  scenario?: string;
 }
 
-export default function InterviewRoom({ brief }: Props) {
+export default function InterviewRoom({ brief, scenario = brief.id }: Props) {
   const router = useRouter();
   const firstName = brief.persona.name.split(" ")[0];
 
@@ -68,7 +71,7 @@ export default function InterviewRoom({ brief }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          scenario: brief.id,
+          scenario,
           messages: nextMessages,
           revealedIds,
           canon,
@@ -117,7 +120,7 @@ export default function InterviewRoom({ brief }: Props) {
       const res = await fetch("/api/grade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario: brief.id, messages }),
+        body: JSON.stringify({ scenario, messages }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as {
