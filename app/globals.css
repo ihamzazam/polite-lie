@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/*
+ * Design language: editorial, confident, a little cold. Near-black "ink"
+ * canvas, warm off-white type, and a single warm-gold accent that reads as
+ * polite warmth — the tell of the whole product. No default-template look
+ * (CLAUDE.md rule 10).
+ */
+@theme {
+  --color-ink-950: #09090b;
+  --color-ink-900: #121215;
+  --color-ink-800: #1d1d22;
+  --color-ink-700: #2a2a31;
+  --color-ink-600: #3b3b43;
+  --color-ink-400: #84848e;
+  --color-ink-300: #aeaeb8;
+  --color-ink-200: #d4d4dc;
+  --color-ink-50: #f5f5f7;
+
+  --color-accent: #d6a043;
+  --color-accent-bright: #eec273;
+  --color-accent-dim: #8a6a2e;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-ink-950);
+  color: var(--color-ink-200);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-ink-950);
+}
+
+/* Honor reduced-motion globally; the report reveal animation also opts in. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
