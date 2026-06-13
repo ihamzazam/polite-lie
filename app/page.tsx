@@ -137,6 +137,16 @@ export default function Home() {
             Build one →
           </span>
         </Link>
+
+        <p className="mt-4 text-sm text-ink-400">
+          Already ran a real interview?{" "}
+          <Link
+            href="/paste"
+            className="font-medium text-ink-200 underline-offset-4 hover:text-accent hover:underline"
+          >
+            Paste the transcript for a technique audit →
+          </Link>
+        </p>
       </section>
 
       {/* Scoring one-liner */}

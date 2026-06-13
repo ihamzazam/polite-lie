@@ -1,4 +1,4 @@
-import type { ScoreResult } from "@/lib/scoring";
+import type { ScoreResult, TechniqueOnlyResult } from "@/lib/scoring";
 import type { Disposition } from "@/lib/types";
 
 /**
@@ -52,6 +52,21 @@ export interface Report {
   narrative: ReportNarrative;
 }
 
+/** Paste mode (SPEC §6): technique audit on a real transcript, no fact sheet,
+ *  so no discovery and no "what you never found out". */
+export interface PasteNarrative {
+  verdict: string;
+  worst: WorstQuestion[];
+  best: BestQuestion | null;
+  drills: string[];
+}
+
+export interface PasteReport {
+  kind: "paste";
+  scores: TechniqueOnlyResult;
+  narrative: PasteNarrative;
+}
+
 /** Gate failure: too few counted questions to grade (SPEC §3). */
 export interface UngradedResult {
   gateMet: false;
@@ -62,6 +77,10 @@ export interface UngradedResult {
 export type GradeResult = Report | UngradedResult;
 
 export function isGraded(r: GradeResult): r is Report {
+  return (r as UngradedResult).gateMet !== false;
+}
+
+export function isPasteGraded(r: PasteReport | UngradedResult): r is PasteReport {
   return (r as UngradedResult).gateMet !== false;
 }
 

@@ -168,6 +168,59 @@ export function gradeFromTotal(total: number): Grade {
   return "F";
 }
 
+export interface TechniqueOnlyResult {
+  gateMet: boolean;
+  countedQuestions: number;
+  techniqueBreakdown: TechniqueBreakdown;
+  technique: number; // /50
+  total: number; // technique rescaled to /100 (paste mode has no discovery)
+  grade: Grade;
+}
+
+/**
+ * Paste-mode scoring (SPEC §6): no fact sheet, so no discovery layer. Score the
+ * six technique components out of 50 and rescale to 100. A pure technique audit.
+ */
+export function computeTechniqueOnly(
+  turns: ClassifiedTurn[],
+  traineeWords: number,
+  totalWords: number,
+  gateMin: number = DEFAULT_GATE_MIN,
+): TechniqueOnlyResult {
+  const counted = turns.filter((t) => !NON_COUNTED_TYPES.has(t.type));
+  const breakdown: TechniqueBreakdown = {
+    question_quality: computeQuestionQuality(counted),
+    probe_depth: computeProbeDepth(counted),
+    talk_ratio: computeTalkRatio(traineeWords, totalWords),
+    pitch_discipline: computePitchDiscipline(counted),
+    money_courage: computeMoneyCourage(counted),
+    validation_hygiene: computeValidationHygiene(counted),
+  };
+  const technique =
+    breakdown.question_quality +
+    breakdown.probe_depth +
+    breakdown.talk_ratio +
+    breakdown.pitch_discipline +
+    breakdown.money_courage +
+    breakdown.validation_hygiene;
+  const total = clamp(technique * 2, 0, 100);
+  return {
+    gateMet: counted.length >= gateMin,
+    countedQuestions: counted.length,
+    techniqueBreakdown: {
+      question_quality: round1(breakdown.question_quality),
+      probe_depth: round1(breakdown.probe_depth),
+      talk_ratio: round1(breakdown.talk_ratio),
+      pitch_discipline: round1(breakdown.pitch_discipline),
+      money_courage: round1(breakdown.money_courage),
+      validation_hygiene: round1(breakdown.validation_hygiene),
+    },
+    technique: round1(technique),
+    total: round1(total),
+    grade: gradeFromTotal(total),
+  };
+}
+
 export function computeScores(input: ScoringInput): ScoreResult {
   const turns = input.classification.turns;
   const counted = countedTurns(turns);
