@@ -24,10 +24,13 @@ interface ModelSet {
 }
 
 const DEFAULTS: Record<LlmProvider, ModelSet> = {
-  // Persona is a fast chat model (low latency, supports temperature); grading
-  // uses the flagship for accuracy and report quality.
+  // Persona uses a fast model that honors temperature 0.9 for human texture
+  // (gpt-5.4-mini, ~1.3s/turn); grading uses the flagship for accuracy and
+  // report quality. Note: gpt-5.5 / *-chat-latest only accept the default
+  // temperature, which completeText() handles, but the persona wants real
+  // sampling control so it runs on the mini.
   openai: {
-    persona: "gpt-5.5-instant",
+    persona: "gpt-5.4-mini",
     classifier: "gpt-5.5",
     narrative: "gpt-5.5",
     generator: "gpt-5.5",

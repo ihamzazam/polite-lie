@@ -21,10 +21,14 @@ Persona is a fast chat model (low latency, temperature ~0.9, ~12 calls/session);
 
 ```
 # OpenAI (default)
-PERSONA_MODEL=gpt-5.5-instant   # fast, natural, supports temperature
-CLASSIFIER_MODEL=gpt-5.5        # flagship: strict JSON, temperature 0
+PERSONA_MODEL=gpt-5.4-mini      # fast (~1.3s), honors temperature 0.9
+CLASSIFIER_MODEL=gpt-5.5        # flagship; note: only default temperature
 NARRATIVE_MODEL=gpt-5.5
 GENERATOR_MODEL=gpt-5.5         # custom scenarios only
+# gpt-5.5 / *-chat-latest accept only the default temperature; completeText()
+# falls back automatically. The persona runs on gpt-5.4-mini precisely because
+# it accepts the 0.9 sampling the human texture needs. Classifier determinism
+# in Phase 2 leans on structured outputs + tolerance-based evals, not temp 0.
 
 # Anthropic (LLM_PROVIDER=anthropic)
 PERSONA_MODEL=claude-haiku-4-5-20251001
